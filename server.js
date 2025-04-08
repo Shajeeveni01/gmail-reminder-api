@@ -5,42 +5,33 @@ require("dotenv").config();
 
 const app = express();
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
 
+// ✅ CORS setup
+app.use(cors({ origin: "*", methods: ["GET", "POST"] }));
 
-// ✅ Proper CORS config to allow all localhost ports during development
-const cors = require("cors");
-
-app.use(cors({
-  origin: "*", // temporarily allow all origins for testing
-  methods: ["GET", "POST"],
-  allowedHeaders: ["Content-Type"],
-}));
-
-
+// ✅ Middleware
 app.use(express.json());
 
+// ✅ POST endpoint
 app.post("/send-reminder", async (req, res) => {
   const { to, subject, text } = req.body;
 
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
-
-  const mailOptions = {
-    from: `Dog360 Reminders <${process.env.EMAIL_USER}>`,
-    to,
-    subject,
-    text,
-  };
-
   try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: `Dog360 Reminders <${process.env.EMAIL_USER}>`,
+      to,
+      subject,
+      text,
+    };
+
     await transporter.sendMail(mailOptions);
     res.status(200).json({ success: true, message: "Email sent successfully" });
   } catch (error) {
@@ -49,10 +40,12 @@ app.post("/send-reminder", async (req, res) => {
   }
 });
 
+// ✅ Root check
 app.get("/", (req, res) => {
   res.send("Gmail Reminder API is running!");
 });
 
+// ✅ Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
