@@ -36,7 +36,7 @@ app.post("/send-reminder", async (req, res) => {
           <p>This is a gentle reminder for your beloved pet <strong style="color: #333;">${to}</strong>.</p>
           <p style="background: white; padding: 15px; border-left: 5px solid #cc3366; margin: 20px 0; border-radius: 5px;">
             <strong>Reminder:</strong><br/>
-            ${text}
+            ${text.replace(/\n/g, "<br/>")}
           </p>
           <p>Don’t forget to check your Dog360 calendar for upcoming events and health records!</p>
           <br/>
@@ -45,7 +45,6 @@ app.post("/send-reminder", async (req, res) => {
         </div>
       `,
     };
-    ;
 
     await transporter.sendMail(mailOptions);
     res.status(200).json({ success: true, message: "Email sent successfully" });
